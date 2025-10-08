@@ -2,13 +2,13 @@
 
 Contrato inteligente en Move para la blockchain Sui que permite mintear, gestionar y evolucionar NFTs de especies marinas con diferentes niveles de rareza.
 
-## 📋 Descripción General
+## Descripción General
 
 Este contrato implementa un sistema de NFTs únicos que representan especies marinas. Cada especie tiene atributos personalizables, niveles de rareza (Común, Rara, Épica, Legendaria) y capacidad de evolución.
 
 ---
 
-## 🔧 Funciones Principales
+## Funciones Principales
 
 ### 1. `mintear_especie`
 **Descripción:** Crea un nuevo NFT de especie marina y lo transfiere al creador.
@@ -151,11 +151,10 @@ evolucionar_especie(
 **Parámetros:**
 - `especie: EspecieMarino` - NFT a eliminar (consume el objeto)
 
-**Uso:** Elimina un NFT que ya no se desea conservar. Esta acción es irreversible.
 
 ---
 
-## 🎯 Niveles de Rareza
+##  Niveles de Rareza
 
 | Nivel | Valor | Descripción |
 |-------|-------|-------------|
@@ -165,25 +164,7 @@ evolucionar_especie(
 | Legendaria | 100 | Especies únicas y extremadamente raras |
 
 ---
-
-## ⚠️ Errores
-
-- `E_RAREZA_INVALIDA` - El tipo de rareza proporcionado no es válido (debe ser 0-3)
-- `E_NOMBRE_VACIO` - El nombre de la especie no puede estar vacío
-
----
-
-## 🚀 Flujo de Uso Típico
-
-1. **Mintear** una especie marina con `mintear_especie()`
-2. **Consultar** sus propiedades con `obtener_nombre()`, `obtener_descripcion()`, `contar_atributos()`
-3. **Evolucionar** la especie con `evolucionar_especie()` para agregar atributos y mejorar rareza
-4. **Actualizar** información con `actualizar_descripcion()` o `cambiar_nombre()` si es necesario
-5. **Transferir** a otro usuario con `transferir_especie()` o **eliminar** con `eliminar_especie()`
-
----
-
-## 📦 Estructura del NFT
+## Estructura del NFT
 
 ```move
 public struct EspecieMarino has key, store {
@@ -195,16 +176,3 @@ public struct EspecieMarino has key, store {
 }
 ```
 
----
-
-## 🔐 Seguridad
-
-- Los NFTs solo pueden ser modificados por su propietario actual
-- La eliminación es permanente e irreversible
-- Las validaciones previenen estados inválidos (nombres vacíos, rarezas incorrectas)
-
----
-
-## 📝 Nota
-
-Este contrato está diseñado para la blockchain Sui y utiliza el framework Move. Asegúrate de tener configurado el entorno Sui CLI para desplegar y probar el contrato.
