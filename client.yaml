@@ -1,0 +1,15 @@
+---
+keystore:
+  File: sui.keystore
+envs:
+  - alias: testnet
+    rpc: "https://fullnode.testnet.sui.io:443"
+    ws: ~
+    basic_auth: ~
+
+  - alias: mainnet
+    rpc: "https://fullnode.mainnet.sui.io:443"
+    ws: ~
+    basic_auth: ~
+active_env: mainnet
+active_address: "0x834ef2f8f2f98986320d4f47ae5cc06d9e3f689c1fb0cb38eea35bb2ca939165"

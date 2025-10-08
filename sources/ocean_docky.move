@@ -1,16 +1,12 @@
 module marino_nft::especie {
     // Imports necesarios para Sui y strings
-    use sui::object::{Self, UID, ID};
-    use sui::tx_context::{Self, TxContext};
-    use sui::transfer;
-    use sui::string::{Self, String};
-    use std::vector;
+    use std::string::String;
 
     // --- ESTRUCTURAS PRINCIPALES ---
 
     // NFT principal: Representa una especie marina única con ID, nombre, rareza y atributos.
     public struct EspecieMarino has key, store {
-        id: UID,
+        id: sui::object::UID,
         nombre: String,
         descripcion: String,
         rareza: Rareza,
@@ -48,35 +44,40 @@ module marino_nft::especie {
     // --- FUNCIONES PRINCIPALES ---
 
     // Mintea un nuevo NFT de especie marina.
+    #[allow(lint(self_transfer))]
     public fun mintear_especie(
         nombre: String,
         descripcion: String,
         rareza_tipo: u8,  // 0=Comun, 1=Rara, 2=Epica, 3=Legendaria
         atributos: vector<String>,
-        ctx: &mut TxContext
+        ctx: &mut sui::tx_context::TxContext
     ) {
-        assert!(!string::is_empty(&nombre), E_NOMBRE_VACIO);
+        assert!(!nombre.is_empty(), E_NOMBRE_VACIO);
 
         let rareza = match_rareza(rareza_tipo);
         let especie = EspecieMarino {
-            id: object::new(ctx),
+            id: sui::object::new(ctx),
             nombre,
             descripcion,
             rareza,
             atributos
         };
         // Transfiere al creador.
-        transfer::transfer(especie, tx_context::sender(ctx));
+        sui::transfer::transfer(especie, ctx.sender());
     }
 
     // Función helper para crear el enum Rareza.
     fun match_rareza(tipo: u8): Rareza {
-        match tipo {
-            0 => Rareza::comun(Comun { valor: 1 }),
-            1 => Rareza::rara(Rara { valor: 5 }),
-            2 => Rareza::epica(Epica { valor: 20 }),
-            3 => Rareza::legendaria(Legendaria { valor: 100 }),
-            _ => abort E_RAREZA_INVALIDA
+        if (tipo == 0) {
+            Rareza::Comun(Comun { valor: 1 })
+        } else if (tipo == 1) {
+            Rareza::Rara(Rara { valor: 5 })
+        } else if (tipo == 2) {
+            Rareza::Epica(Epica { valor: 20 })
+        } else if (tipo == 3) {
+            Rareza::Legendaria(Legendaria { valor: 100 })
+        } else {
+            abort E_RAREZA_INVALIDA
         }
     }
 
@@ -90,22 +91,20 @@ module marino_nft::especie {
         especie.rareza = match_rareza(nueva_rareza_tipo);
     }
 
-    // Obtiene el valor de rareza como string para display.
-    public fun obtener_valor_rareza(especie: &EspecieMarino): String {
-        let mut valor_str = string::utf8(b"Valor: ");
-        match &especie.rareza {
-            Rareza::comun(d) => valor_str = string::append(&mut valor_str, (d.valor as u64).into_string()),
-            Rareza::rara(d) => valor_str = string::append(&mut valor_str, (d.valor as u64).into_string()),
-            Rareza::epica(d) => valor_str = string::append(&mut valor_str, (d.valor as u64).into_string()),
-            Rareza::legendaria(d) => valor_str = string::append(&mut valor_str, (d.valor as u64).into_string())
-        };
-        valor_str
+    // Obtiene el valor de rareza como u8 para display.
+    public fun obtener_valor_rareza(especie: &EspecieMarino): u8 {
+        match (&especie.rareza) {
+            Rareza::Comun(d) => d.valor,
+            Rareza::Rara(d) => d.valor,
+            Rareza::Epica(d) => d.valor,
+            Rareza::Legendaria(d) => d.valor,
+        }
     }
 
     // Elimina el NFT (solo el owner puede, en un contexto real agrega checks).
     public fun eliminar_especie(especie: EspecieMarino) {
         let EspecieMarino { id, nombre: _, descripcion: _, rareza: _, atributos: _ } = especie;
-        object::delete(id);
+        sui::object::delete(id);
     }
 
     // Actualiza la descripción de una especie marina.
@@ -115,7 +114,7 @@ module marino_nft::especie {
 
     // Cambia el nombre de una especie marina.
     public fun cambiar_nombre(especie: &mut EspecieMarino, nuevo_nombre: String) {
-        assert!(!string::is_empty(&nuevo_nombre), E_NOMBRE_VACIO);
+        assert!(!nuevo_nombre.is_empty(), E_NOMBRE_VACIO);
         especie.nombre = nuevo_nombre;
     }
 
@@ -135,7 +134,8 @@ module marino_nft::especie {
     }
 
     // Transfiere una especie marina a otro usuario.
+    #[allow(lint(custom_state_change))]
     public fun transferir_especie(especie: EspecieMarino, destinatario: address) {
-        transfer::transfer(especie, destinatario);
+        sui::transfer::transfer(especie, destinatario);
     }
 }
